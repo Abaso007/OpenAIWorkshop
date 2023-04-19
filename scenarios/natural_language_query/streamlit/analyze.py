@@ -36,11 +36,20 @@ class AnalyzeGPT:
         username = self.db_user
         password = self.db_password
         driver = '{ODBC Driver 17 for SQL Server}' # Update the driver version as per your installation  
-        
-        # Establish the connection  
-        conn = pyodbc.connect('DRIVER=' + driver + ';SERVER=' + self.dbserver + ';DATABASE=' + self.database + ';UID=' + username + ';PWD=' + password)  
 
-        
+        # Establish the connection
+        conn = pyodbc.connect(
+            f'DRIVER={driver};SERVER='
+            + self.dbserver
+            + ';DATABASE='
+            + self.database
+            + ';UID='
+            + username
+            + ';PWD='
+            + password
+        )  
+
+
         #logging.info(conn)
         cursor = conn.cursor()
         try:
@@ -49,15 +58,12 @@ class AnalyzeGPT:
         except Exception as e:
             return str(e)
 
-        cols = []
-        for i,_ in enumerate(cursor.description):
-            cols.append(cursor.description[i][0])
-        if len(cols)>0:
-            result = pd.DataFrame(np.array(data), columns = cols).head(20) #limit to 20
-        else:
-            result = pd.DataFrame()
-
-        return result
+        cols = [cursor.description[i][0] for i, _ in enumerate(cursor.description)]
+        return (
+            pd.DataFrame(np.array(data), columns=cols).head(20)
+            if cols
+            else pd.DataFrame()
+        )
     def visualize(self,python_code, observation_df,st):
         
         if ('```' in python_code):

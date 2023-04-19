@@ -31,17 +31,15 @@ faq =["is AML SDK v2 compatible with v1?",
 
 st.set_page_config(layout="wide")
 
-col1, col2, col3  = st.columns((2,8, 2)) 
+col1, col2, col3  = st.columns((2,8, 2))
 option = col2.selectbox('FAQs',faq)
 question = col2.text_area("", option, height=100, placeholder="please enter your question" )
 
-if col2.button("Submit"):  
-    # call azure function app url
-    if question:
-        response = requests.post(AZURE_ORCHESTRATOR_FUNC_APP_URL, json={"prompt":question})
-        if response.status_code == 200:
-            response_json = response.json()
-            col2.write(response_json["result"])
-            col2.write(response_json["gpt_prompt"])
-        else:
-            col2.write("No results found")
+if col2.button("Submit") and question:
+    response = requests.post(AZURE_ORCHESTRATOR_FUNC_APP_URL, json={"prompt":question})
+    if response.status_code == 200:
+        response_json = response.json()
+        col2.write(response_json["result"])
+        col2.write(response_json["gpt_prompt"])
+    else:
+        col2.write("No results found")
